@@ -43,7 +43,45 @@ const sb = {
       }
     };
     return () => ws.close();
-  }
+  },
+
+  // Auth
+  async signUp(email, password) {
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.msg || data.error_description || "Sign up failed");
+    return data;
+  },
+
+  async signIn(email, password) {
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.msg || data.error_description || "Sign in failed");
+    return data; // { access_token, user, ... }
+  },
+
+  async signOut(token) {
+    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${token}` },
+    });
+  },
+
+  async getUser(token) {
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${token}` },
+    });
+    if (!r.ok) return null;
+    return r.json();
+  },
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -900,6 +938,8 @@ const PALETTE = ["#60a5fa","#f59e0b","#34d399","#f472b6","#a78bfa","#fb923c","#2
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem("bcrm:token") || null);
+  const [authUser,  setAuthUser]  = useState(() => { try { return JSON.parse(localStorage.getItem("bcrm:user")); } catch { return null; } });
   const [leads,     setLeads]     = useState([]);
   const [team,      setTeam]      = useState(DEFAULT_TEAM);
   const [view,      setView]      = useState("leads");
@@ -920,6 +960,30 @@ export default function App() {
   const [syncing,   setSyncing]   = useState(false);
   const [lastSync,  setLastSync]  = useState(null);
   const [syncError, setSyncError] = useState(false);
+
+  const handleAuth = (token, user) => {
+    setAuthToken(token);
+    setAuthUser(user);
+    // Try to match display_name to a team member so "me" is set correctly
+    const displayName = user?.display_name || user?.user_metadata?.display_name || "";
+    if (displayName) {
+      const match = team.find(m => m.name.toLowerCase() === displayName.toLowerCase());
+      if (match) { setMe(match.id); localStorage.setItem("bcrm:me", match.id); }
+    }
+  };
+
+  const handleSignOut = async () => {
+    try { await sb.signOut(authToken); } catch {}
+    localStorage.removeItem("bcrm:token");
+    localStorage.removeItem("bcrm:user");
+    setAuthToken(null);
+    setAuthUser(null);
+    setLeads([]);
+    setReady(false);
+  };
+
+  // Don't load data until authenticated
+  if (!authToken) return <LoginScreen onAuth={handleAuth} />;
 
   // ── Load from Supabase ────────────────────────────────────────────────────
   useEffect(() => {
@@ -1211,9 +1275,18 @@ export default function App() {
               <div style={S.syncLabel}>{syncing ? "Syncing…" : syncError ? "Sync failed" : "Sheets connected"}</div>
               {lastSync && !syncing && <div style={S.syncTime}>Last sync {lastSync.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>}
             </div>
-            <button style={S.syncBtn} onClick={() => syncFromSheets(gasUrl, leads)} disabled={syncing}>↺</button>
+            <button style={S.syncBtn} onClick={() => syncFromSheets(gasUrl)} disabled={syncing}>↺</button>
           </div>
         )}
+
+        {/* Signed-in user + sign out */}
+        <div style={{ margin: "0 10px 14px", padding: "10px 12px", background: "#1e293b", borderRadius: 8 }}>
+          <div style={{ fontSize: 10, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Signed in as</div>
+          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{authUser?.display_name || authUser?.user_metadata?.display_name || authUser?.email || "—"}</div>
+          <button onClick={handleSignOut} style={{ width: "100%", background: "#0f172a", border: "1px solid #334155", color: "#94a3b8", borderRadius: 6, padding: "6px 0", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* MAIN */}
@@ -2221,6 +2294,128 @@ function SmartList({ title, subtitle, icon, leads, team, onSelect }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+
+// ─── Login Screen ─────────────────────────────────────────────────────────────
+
+function LoginScreen({ onAuth }) {
+  const [mode,        setMode]        = useState("login");
+  const [email,       setEmail]       = useState("");
+  const [password,    setPassword]    = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [error,       setError]       = useState("");
+  const [loading,     setLoading]     = useState(false);
+
+  const inputStyle = { width: "100%", padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", color: "#0f172a" };
+  const labelStyle = { fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 };
+
+  const submit = async () => {
+    if (!email.trim() || !password.trim()) { setError("Please enter your email and password."); return; }
+    if (mode === "signup" && !displayName.trim()) { setError("Please enter your name."); return; }
+    setLoading(true); setError("");
+    try {
+      let data;
+      if (mode === "login") {
+        data = await sb.signIn(email.trim(), password);
+      } else {
+        // Sign up with display name stored in user_metadata
+        const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+          method: "POST",
+          headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), password, data: { display_name: displayName.trim() } }),
+        });
+        data = await r.json();
+        if (!r.ok) throw new Error(data.msg || data.error_description || "Sign up failed");
+        if (!data.access_token) {
+          setError("Account created! Check your email to confirm, then sign in.");
+          setMode("login"); setLoading(false); return;
+        }
+      }
+      const user = data.user;
+      // Attach display_name so the rest of the app can use it
+      const displayNameFinal = user?.user_metadata?.display_name || displayName.trim() || user?.email?.split("@")[0] || "";
+      const enrichedUser = { ...user, display_name: displayNameFinal };
+      localStorage.setItem("bcrm:token", data.access_token);
+      localStorage.setItem("bcrm:user",  JSON.stringify(enrichedUser));
+      onAuth(data.access_token, enrichedUser);
+    } catch (e) {
+      setError(e.message || "Something went wrong.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div style={{ width: 400, background: "#fff", borderRadius: 16, padding: "40px 36px", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
+          <span style={{ fontSize: 28, color: "#dc2626" }}>⬟</span>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.5px" }}>BuildCRM</div>
+            <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 500 }}>Spade Custom Homes</div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>
+          {mode === "login" ? "Welcome back" : "Create account"}
+        </div>
+        <div style={{ fontSize: 13, color: "#64748b", marginBottom: 28 }}>
+          {mode === "login" ? "Sign in to access your leads" : "Set up your account to get started"}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {mode === "signup" && (
+            <div>
+              <label style={labelStyle}>Your Name</label>
+              <input
+                type="text" value={displayName} onChange={e => setDisplayName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && submit()}
+                placeholder="e.g. Michelle French"
+                style={inputStyle}
+                autoFocus
+              />
+            </div>
+          )}
+          <div>
+            <label style={labelStyle}>Email</label>
+            <input
+              type="email" value={email} onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && submit()}
+              placeholder="you@example.com"
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Password</label>
+            <input
+              type="password" value={password} onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && submit()}
+              placeholder="••••••••"
+              style={inputStyle}
+            />
+          </div>
+
+          {error && (
+            <div style={{ fontSize: 12, color: error.includes("Check your email") ? "#16a34a" : "#dc2626", background: error.includes("Check your email") ? "#dcfce7" : "#fef2f2", padding: "10px 14px", borderRadius: 8 }}>
+              {error}
+            </div>
+          )}
+
+          <button onClick={submit} disabled={loading}
+            style={{ width: "100%", padding: "12px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit", marginTop: 4 }}>
+            {loading ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
+          </button>
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#64748b" }}>
+          {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+          <span onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setDisplayName(""); }} style={{ color: "#dc2626", fontWeight: 700, cursor: "pointer" }}>
+            {mode === "login" ? "Sign up" : "Sign in"}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
