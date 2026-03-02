@@ -1075,17 +1075,6 @@ const SAMPLE_LEADS = [
   },
 ];
 
-// ── Email → team member mapping (login locks you in as yourself) ──────────────
-const EMAIL_TO_MEMBER = {
-  "abigail@abigailswihart.com": "u1",
-  "billruffnerhomes@gmail.com": "u2",
-  "mfrenchhomes@gmail.com":     "u3",
-  "toby@spadecustomhomes.com":  "u4",
-  "mark@zollingerbuilders.com": "u5",
-  "jock@zollingerbuilders.com": "u6",
-  "heather@abigailswihart.com": "u7",
-};
-
 function genId() { return Math.random().toString(36).slice(2, 10); }
 function fmtDate(iso) {
   if (!iso) return "—";
