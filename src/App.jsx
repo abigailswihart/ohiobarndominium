@@ -951,7 +951,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2025-07-06T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "y29jqxs0",
@@ -971,7 +971,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2025-12-18T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "a9c3dwsb",
@@ -991,7 +991,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2025-12-18T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "wmnkjz3c",
@@ -1011,7 +1011,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2025-12-19T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "3g6dyb9o",
@@ -1031,7 +1031,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2025-12-29T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "ru2t7gkk",
@@ -1051,7 +1051,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2026-01-14T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
   {
     id: "iihlz41u",
@@ -1071,7 +1071,7 @@ const SAMPLE_LEADS = [
     tags: [],
     notes: [],
     createdAt: "2026-02-21T00:00:00",
-    fromSheets: False,
+    fromSheets: false,
   },
 ];
 
