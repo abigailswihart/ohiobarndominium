@@ -84,6 +84,18 @@ const sb = {
   },
 };
 
+// ── Email → team member mapping (login locks you in as yourself) ──────────────
+const EMAIL_TO_MEMBER = {
+  "abigail@abigailswihart.com":  "u1",
+  "billruffnerhomes@gmail.com":  "u2",
+  "mfrenchhomes@gmail.com":      "u3",
+  "toby@spadecustomhomes.com":   "u4",
+  "mark@zollingerbuilders.com":  "u5",
+  "jock@zollingerbuilders.com":  "u6",
+  "heather@abigailswihart.com":  "u7",
+};
+
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STAGES = [
@@ -150,11 +162,13 @@ const OHIO_REGIONS = [
 ];
 
 const DEFAULT_TEAM = [
-  { id: "u1", name: "Abigail Valentine", role: "Sales Rep",             initials: "AV", color: "#dc2626" },
-  { id: "u2", name: "Bill Ruffner",      role: "Sales Rep",             initials: "BR", color: "#ea580c" },
-  { id: "u3", name: "Michelle French",   role: "Sales Rep",             initials: "MF", color: "#9333ea" },
-  { id: "u4", name: "Toby Spade",        role: "Developer — Columbus",  initials: "TS", color: "#0369a1" },
-  { id: "u5", name: "Mark Zollinger",    role: "Developer — Wooster",   initials: "MZ", color: "#15803d" },
+  { id: "u1", name: "Abigail Swihart",  role: "Sales Rep",             initials: "AS", color: "#dc2626", email: "abigail@abigailswihart.com" },
+  { id: "u2", name: "Bill Ruffner",     role: "Sales Rep",             initials: "BR", color: "#ea580c", email: "billruffnerhomes@gmail.com"  },
+  { id: "u3", name: "Michelle French",  role: "Sales Rep",             initials: "MF", color: "#9333ea", email: "mfrenchhomes@gmail.com"       },
+  { id: "u4", name: "Toby Spade",       role: "Developer — Columbus",  initials: "TS", color: "#0369a1", email: "toby@spadecustomhomes.com"   },
+  { id: "u5", name: "Mark Zollinger",   role: "Developer — Wooster",   initials: "MZ", color: "#15803d", email: "mark@zollingerbuilders.com"  },
+  { id: "u6", name: "Jock Zollinger",   role: "Developer — Wooster",   initials: "JZ", color: "#0d9488", email: "jock@zollingerbuilders.com"  },
+  { id: "u7", name: "Heather Angeny",   role: "Sales Rep",             initials: "HA", color: "#7c3aed", email: "heather@abigailswihart.com"  },
 ];
 
 const SAMPLE_LEADS = [
@@ -918,8 +932,159 @@ const SAMPLE_LEADS = [
     notes: [],
     createdAt: "2026-02-26T21:07:58.976902",
     fromSheets: false,
+  },,
+  {
+    id: "x7impdk1",
+    name: "Ramona Caporossi",
+    company: "",
+    email: "mydeer1@gmail.com",
+    phone: "(330) 242-5941",
+    projectType: "Build a Barndominium",
+    stage: "New Inquiry",
+    value: 0,
+    source: "In the next 12 months",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Central Ohio (Columbus)",
+    hasProperty: "No",
+    budget: "Under $300k",
+    tags: [],
+    notes: [],
+    createdAt: "2025-07-06T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "y29jqxs0",
+    name: "Jennifer Londo",
+    company: "",
+    email: "jenniferlondo@hopeworks.co",
+    phone: "(440) 714-1538",
+    projectType: "Build a Barndominium",
+    stage: "New Inquiry",
+    value: 0,
+    source: "ASAP",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "No",
+    budget: "Under $300k",
+    tags: [],
+    notes: [],
+    createdAt: "2025-12-18T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "a9c3dwsb",
+    name: "Pamela J Lockett",
+    company: "",
+    email: "lockettforever@gmail.com",
+    phone: "(330) 990-7060",
+    projectType: "Build a Barndominium",
+    stage: "New Inquiry",
+    value: 0,
+    source: "In the next 12 months",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "No",
+    budget: "$500k - $1M",
+    tags: [],
+    notes: [],
+    createdAt: "2025-12-18T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "wmnkjz3c",
+    name: "James D Stachowiak",
+    company: "",
+    email: "jimkana@zoominternet.net",
+    phone: "(330) 242-3201",
+    projectType: "Build a Barndominium",
+    stage: "Initial Consult Complete",
+    value: 0,
+    source: "ASAP",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "Yes",
+    budget: "$300k - $500k",
+    tags: [],
+    notes: [],
+    createdAt: "2025-12-19T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "3g6dyb9o",
+    name: "Rachel Metz",
+    company: "",
+    email: "rme.46732@gmail.com",
+    phone: "(440) 591-2792",
+    projectType: "Build a Barndominium",
+    stage: "Initial Consult Complete",
+    value: 0,
+    source: "In the next 12 months",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "No",
+    budget: "$300k - $500k",
+    tags: [],
+    notes: [],
+    createdAt: "2025-12-29T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "ru2t7gkk",
+    name: "JJ Kocevar",
+    company: "",
+    email: "jkocevar13@gmail.com",
+    phone: "(330) 419-3823",
+    projectType: "Build a Barndominium",
+    stage: "New Inquiry",
+    value: 0,
+    source: "ASAP",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "Yes",
+    budget: "$300k - $500k",
+    tags: [],
+    notes: [],
+    createdAt: "2026-01-14T00:00:00",
+    fromSheets: False,
+  },
+  {
+    id: "iihlz41u",
+    name: "Kevin Schiele",
+    company: "",
+    email: "kevinschiele0625@yahoo.com",
+    phone: "(330) 604-1597",
+    projectType: "Build a Barndominium",
+    stage: "New Inquiry",
+    value: 0,
+    source: "In the next 12 months",
+    assignedTo: "u4",
+    salesRep: "u3",
+    region: "Northeast Ohio (Wooster / Akron)",
+    hasProperty: "No",
+    budget: "$500k - $1M",
+    tags: [],
+    notes: [],
+    createdAt: "2026-02-21T00:00:00",
+    fromSheets: False,
   },
 ];
+
+// ── Email → team member mapping (login locks you in as yourself) ──────────────
+const EMAIL_TO_MEMBER = {
+  "abigail@abigailswihart.com": "u1",
+  "billruffnerhomes@gmail.com": "u2",
+  "mfrenchhomes@gmail.com":     "u3",
+  "toby@spadecustomhomes.com":  "u4",
+  "mark@zollingerbuilders.com": "u5",
+  "jock@zollingerbuilders.com": "u6",
+  "heather@abigailswihart.com": "u7",
+};
 
 function genId() { return Math.random().toString(36).slice(2, 10); }
 function fmtDate(iso) {
@@ -964,11 +1129,12 @@ export default function App() {
   const handleAuth = (token, user) => {
     setAuthToken(token);
     setAuthUser(user);
-    // Try to match display_name to a team member so "me" is set correctly
-    const displayName = user?.display_name || user?.user_metadata?.display_name || "";
-    if (displayName) {
-      const match = team.find(m => m.name.toLowerCase() === displayName.toLowerCase());
-      if (match) { setMe(match.id); localStorage.setItem("bcrm:me", match.id); }
+    // Lock user to their team member profile by email
+    const email = user?.email?.toLowerCase().trim() || "";
+    const memberId = EMAIL_TO_MEMBER[email];
+    if (memberId) {
+      setMe(memberId);
+      localStorage.setItem("bcrm:me", memberId);
     }
   };
 
@@ -1210,16 +1376,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Quick switch */}
-        <div style={S.switchArea}>
-          {team.filter(m => m.id !== me).map(m => (
-            <button key={m.id} style={S.switchRow} onClick={() => switchMe(m.id)}>
-              <span style={{ ...S.swDot, background: m.color }} />
-              <span style={S.swName}>{m.name}</span>
-              <span style={{ ...S.swRole, color: m.color }}>{m.role}</span>
-            </button>
-          ))}
-        </div>
+        {/* No manual switching — identity is locked to login */}
 
         <nav style={S.nav}>
           <div style={S.navSection}>LEADS</div>
@@ -1281,8 +1438,11 @@ export default function App() {
 
         {/* Signed-in user + sign out */}
         <div style={{ margin: "0 10px 14px", padding: "10px 12px", background: "#1e293b", borderRadius: 8 }}>
-          <div style={{ fontSize: 10, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Signed in as</div>
-          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{authUser?.display_name || authUser?.user_metadata?.display_name || authUser?.email || "—"}</div>
+          <div style={{ fontSize: 10, color: "#475569", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>🔒 Signed in as</div>
+          <div style={{ fontSize: 12, color: "#e2e8f0", fontWeight: 700, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {myProfile?.name || authUser?.display_name || "—"}
+          </div>
+          <div style={{ fontSize: 10, color: "#475569", marginBottom: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{authUser?.email || ""}</div>
           <button onClick={handleSignOut} style={{ width: "100%", background: "#0f172a", border: "1px solid #334155", color: "#94a3b8", borderRadius: 6, padding: "6px 0", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Sign Out
           </button>
