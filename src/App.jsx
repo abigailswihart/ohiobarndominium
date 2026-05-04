@@ -1142,7 +1142,7 @@ export default function App() {
     return (
       (!q     || l.name.toLowerCase().includes(q) || (l.company||"").toLowerCase().includes(q) || (l.region||"").toLowerCase().includes(q) || l.email.toLowerCase().includes(q)) &&
       (!fStage || l.stage === fStage) &&
-      (!fWho   || (fWho === "_none" ? !l.assignedTo : l.assignedTo === fWho)) &&
+      (!fWho   || (fWho === "_none" ? !l.assignedTo : l.assignedTo === fWho || l.salesRep === fWho)) &&
       (!fTag   || (l.tags||[]).includes(fTag))
     );
   });
