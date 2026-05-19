@@ -170,6 +170,7 @@ const DEFAULT_TEAM = [
   { id: "u6", name: "Jock Zollinger",   role: "Developer — Wooster",   initials: "JZ", color: "#0d9488", email: "jock@zollingerbuilders.com"       },
   { id: "u7", name: "Heather Angeny",   role: "Sales Rep",             initials: "HA", color: "#7c3aed", email: "heather@abigailswihart.com"       },
   { id: "u8", name: "Leslie Dorado",    role: "Sales Rep",             initials: "LD", color: "#d97706", email: "lesliedoradorealtor@gmail.com"    },
+  { id: "u9", name: "Lauren Taylor",    role: "Sales Rep",             initials: "LT", color: "#0891b2", email: "realtorlaurentaylor@gmail.com"     },
 ];
 
 const SAMPLE_LEADS = [
